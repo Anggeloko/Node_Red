@@ -1,0 +1,286 @@
+[
+    {
+        "id": "d6cec6ff.88bdc",
+        "type": "OPCUA-IIoT-Server-Command",
+        "z": "7946db82.5563f4",
+        "commandtype": "restart",
+        "nodeId": "",
+        "name": "warm restart with defaults",
+        "x": 520,
+        "y": 405,
+        "wires": [
+            [
+                "3c2e54c7.dbcb5c"
+            ]
+        ]
+    },
+    {
+        "id": "ba305059.6c144",
+        "type": "OPCUA-IIoT-Inject",
+        "z": "7946db82.5563f4",
+        "injectType": "inject",
+        "payload": "",
+        "payloadType": "date",
+        "topic": "",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "startDelay": "",
+        "name": "",
+        "addressSpaceItems": [],
+        "x": 290,
+        "y": 405,
+        "wires": [
+            [
+                "d6cec6ff.88bdc"
+            ]
+        ]
+    },
+    {
+        "id": "6325d373.3afbc4",
+        "type": "debug",
+        "z": "7946db82.5563f4",
+        "name": "",
+        "active": true,
+        "console": "false",
+        "complete": "false",
+        "x": 900,
+        "y": 405,
+        "wires": []
+    },
+    {
+        "id": "2ef94d4a.057aea",
+        "type": "debug",
+        "z": "7946db82.5563f4",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "x": 864,
+        "y": 49,
+        "wires": []
+    },
+    {
+        "id": "4cf691a.6f23d7",
+        "type": "function",
+        "z": "7946db82.5563f4",
+        "name": "set variable AnalogoRPI in global context",
+        "func": "global.set('AnalogoRPI', {\n    value: msg.payload,\n    dataTypeName: 'Double',\n    name: 'Global Test Value'\n})\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 603,
+        "y": 49,
+        "wires": [
+            [
+                "2ef94d4a.057aea"
+            ]
+        ]
+    },
+    {
+        "id": "3c2e54c7.dbcb5c",
+        "type": "OPCUA-IIoT-Flex-Server",
+        "z": "7946db82.5563f4",
+        "port": "55391",
+        "endpoint": "",
+        "acceptExternalCommands": true,
+        "maxAllowedSessionNumber": "",
+        "maxConnectionsPerEndpoint": "",
+        "maxAllowedSubscriptionNumber": "",
+        "alternateHostname": "",
+        "name": "",
+        "showStatusActivities": false,
+        "showErrors": false,
+        "allowAnonymous": true,
+        "isAuditing": false,
+        "serverDiscovery": true,
+        "users": [],
+        "xmlsets": [],
+        "publicCertificateFile": "",
+        "privateCertificateFile": "",
+        "maxNodesPerRead": 1000,
+        "maxNodesPerBrowse": 2000,
+        "addressSpaceScript": "function constructAlarmAddressSpace(server, addressSpace, eventObjects, done) {\n    // server = the created node-opcua server\n    // addressSpace = script placeholder\n    // eventObjects = to hold event variables in memory from this script\n    \n    // internal global sandbox objects are \n    // node = node of the flex server, \n    // coreServer = core iiot server object for debug and access to nodeOPCUA,\n    // and scriptObjects to hold variables and functions\n    \n    // globals are to find on node.context().global and should be initialized here\n    node.context().global.set(\"AnalogoRPI\", {})\n    node.context().global.set(\"DigitalRPI\", {})\n    node.context().global.set(\"AnalogVisual\", {})\n    node.context().global.set(\"DigitalVisual\", {})\n    \n    coreServer.internalDebugLog('init dynamic address space')\n    node.warn('construct new address space for OPC UA')\n    \n    // from here - see the node-opcua docs how to build address sapces\n \n    // variable with value\n    if(scriptObjects.MeterVisual === undefined || scriptObjects.MeterVisual === null) {\n            scriptObjects.MeterVisual = 0\n    }\n    \n    if(scriptObjects.PWM === undefined || scriptObjects.PWM === null) {\n            scriptObjects.PWM = 0\n    }\n    \n    if(scriptObjects.LedVisual === undefined || scriptObjects.LedVisual === null) {\n            scriptObjects.LedVisual = 'FALSE'\n    }\n    \n    if(scriptObjects.DigiOut === undefined || scriptObjects.DigiOut === null) {\n            scriptObjects.DigiOut = 'FALSE'\n    }\n    \n    let MQTTin = addressSpace.addObject({\n        browseName: 'MQTTin',\n        description: 'The Object representing some variables',\n        organizedBy: addressSpace.rootFolder.objects,\n        notifierOf: addressSpace.rootFolder.objects.server\n    })\n    \n        if(coreServer.core) {\n        addressSpace.addVariable({\n            componentOf: MQTTin,\n            nodeId: 'ns=4;s=AnalogoRPI',\n            browseName: 'AnalogoRPI',\n            displayName: 'AnalogoRPI',\n            dataType: 'Double',\n                \n                value: {\n                  get: function () {\n                    return new coreServer.core.nodeOPCUA.Variant({\n                      dataType: 'Double',\n                      value: node.context().global.get(\"AnalogoRPI\").value\n                    })\n                  },\n                  set: function (variant) {\n                      scriptObjects.testReadWrite = parseFloat(variant.value)\n                      return coreServer.core.nodeOPCUA.StatusCodes.Good\n                  }\n                }\n            \n        })\n        \n    }\n    \n        if(coreServer.core) {\n        addressSpace.addVariable({\n            componentOf: MQTTin,\n            nodeId: 'ns=4;s=DigitalRPI',\n            browseName: 'DigitalRPI',\n            displayName: 'DigitalRPI',\n            dataType: 'String',\n                \n                value: {\n                  get: function () {\n                    return new coreServer.core.nodeOPCUA.Variant({\n                      dataType: 'String',\n                      value: node.context().global.get(\"DigitalRPI\").value\n                    })\n                  },\n                  set: function (variant) {\n                      scriptObjects.testReadWrite = parseFloat(variant.value)\n                      return coreServer.core.nodeOPCUA.StatusCodes.Good\n                  }\n                }\n            \n        })\n        \n    }\n    \n        if(coreServer.core) {\n        addressSpace.addVariable({\n            componentOf: MQTTin,\n            nodeId: 'ns=4;s=AnalogVisual',\n            browseName: 'AnalogVisual',\n            displayName: 'AnalogVisual',\n            dataType: 'Double',\n                \n                value: {\n                  get: function () {\n                    return new coreServer.core.nodeOPCUA.Variant({\n                      dataType: 'Double',\n                      value: node.context().global.get(\"AnalogVisual\").value\n                    })\n                  },\n                  set: function (variant) {\n                      scriptObjects.testReadWrite = parseFloat(variant.value)\n                      return coreServer.core.nodeOPCUA.StatusCodes.Good\n                  }\n                }\n            \n        })\n        \n    }\n    \n        if(coreServer.core) {\n        addressSpace.addVariable({\n            componentOf: MQTTin,\n            nodeId: 'ns=4;s=DigitalVisual',\n            browseName: 'DigitalVisual',\n            displayName: 'DigitalVisual',\n            dataType: 'String',\n                \n                value: {\n                  get: function () {\n                    return new coreServer.core.nodeOPCUA.Variant({\n                      dataType: 'String',\n                      value: node.context().global.get(\"DigitalVisual\").value\n                    })\n                  },\n                  set: function (variant) {\n                      scriptObjects.testReadWrite = parseFloat(variant.value)\n                      return coreServer.core.nodeOPCUA.StatusCodes.Good\n                  }\n                }\n            \n        })\n        \n    }\n    \n    else {\n        coreServer.internalDebugLog('coreServer.core needed for coreServer.core.nodeOPCUA')\n    }\n    \n    done()\n}",
+        "x": 730,
+        "y": 405,
+        "wires": [
+            [
+                "6325d373.3afbc4"
+            ]
+        ]
+    },
+    {
+        "id": "27510329.ad8dec",
+        "type": "debug",
+        "z": "7946db82.5563f4",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "x": 861,
+        "y": 122,
+        "wires": []
+    },
+    {
+        "id": "1f2709b2.1d067e",
+        "type": "function",
+        "z": "7946db82.5563f4",
+        "name": "set variable DigitalRPI in global context",
+        "func": "global.set('DigitalRPI', {\n    value: msg.payload,\n    dataTypeName: 'String',\n    name: 'Global Test Value'\n})\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 604,
+        "y": 122,
+        "wires": [
+            [
+                "27510329.ad8dec"
+            ]
+        ]
+    },
+    {
+        "id": "ef35b4d8.efc228",
+        "type": "debug",
+        "z": "7946db82.5563f4",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "x": 860,
+        "y": 208,
+        "wires": []
+    },
+    {
+        "id": "49ee0c19.4e7cbc",
+        "type": "function",
+        "z": "7946db82.5563f4",
+        "name": "set variable AnalogVisual in global context",
+        "func": "global.set('AnalogVisual', {\n    value: msg.payload,\n    dataTypeName: 'Double',\n    name: 'Global Test Value'\n})\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 595,
+        "y": 208,
+        "wires": [
+            [
+                "ef35b4d8.efc228"
+            ]
+        ]
+    },
+    {
+        "id": "bac0e1ad.b6fdb",
+        "type": "debug",
+        "z": "7946db82.5563f4",
+        "name": "",
+        "active": false,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "x": 859,
+        "y": 305,
+        "wires": []
+    },
+    {
+        "id": "2893b4f.437b0cc",
+        "type": "function",
+        "z": "7946db82.5563f4",
+        "name": "set variable DigitalVisual in global context",
+        "func": "global.set('DigitalVisual', {\n    value: msg.payload,\n    dataTypeName: 'String',\n    name: 'Global Test Value'\n})\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 600,
+        "y": 306,
+        "wires": [
+            [
+                "bac0e1ad.b6fdb"
+            ]
+        ]
+    },
+    {
+        "id": "77e41cc3.60f344",
+        "type": "mqtt in",
+        "z": "7946db82.5563f4",
+        "name": "Pot",
+        "topic": "/Visualizacion/Pot1",
+        "qos": "0",
+        "broker": "337065f.d09389a",
+        "x": 258,
+        "y": 207,
+        "wires": [
+            [
+                "49ee0c19.4e7cbc"
+            ]
+        ]
+    },
+    {
+        "id": "56beb2a5.8d1ae4",
+        "type": "mqtt in",
+        "z": "7946db82.5563f4",
+        "name": "Switch",
+        "topic": "/Visualizacion/sw1",
+        "qos": "1",
+        "broker": "337065f.d09389a",
+        "x": 263,
+        "y": 306,
+        "wires": [
+            [
+                "2893b4f.437b0cc"
+            ]
+        ]
+    },
+    {
+        "id": "6ccc83a4.ac030c",
+        "type": "mqtt in",
+        "z": "7946db82.5563f4",
+        "name": "AnalogRPI",
+        "topic": "/inRPI/An1",
+        "qos": "1",
+        "broker": "337065f.d09389a",
+        "x": 251,
+        "y": 48,
+        "wires": [
+            [
+                "4cf691a.6f23d7"
+            ]
+        ]
+    },
+    {
+        "id": "67b23fd6.79201",
+        "type": "mqtt in",
+        "z": "7946db82.5563f4",
+        "name": "DigitRPI",
+        "topic": "/inRPI/Dg1",
+        "qos": "1",
+        "broker": "337065f.d09389a",
+        "x": 257,
+        "y": 124,
+        "wires": [
+            [
+                "1f2709b2.1d067e"
+            ]
+        ]
+    },
+    {
+        "id": "337065f.d09389a",
+        "type": "mqtt-broker",
+        "z": "",
+        "name": "ServerCloudMqtt",
+        "broker": "m14.cloudmqtt.com",
+        "port": "13198",
+        "clientid": "",
+        "usetls": false,
+        "compatmode": true,
+        "keepalive": "60",
+        "cleansession": true,
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": "",
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": ""
+    }
+]

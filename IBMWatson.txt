@@ -1,0 +1,250 @@
+[
+    {
+        "id": "e0c3864e.c04928",
+        "type": "inject",
+        "z": "91d3f054.ad921",
+        "name": "",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "repeat": "1",
+        "crontab": "",
+        "once": false,
+        "x": 110,
+        "y": 120,
+        "wires": [
+            [
+                "a78f392e.52c338"
+            ]
+        ]
+    },
+    {
+        "id": "a78f392e.52c338",
+        "type": "function",
+        "z": "91d3f054.ad921",
+        "name": "Generate time data",
+        "func": "// Convert timestamp in milliseconds to a number in 0-20 range\nmsg.payload = Math.floor((msg.payload/1000))%50;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 390,
+        "y": 120,
+        "wires": [
+            [
+                "4710373c.cc2f68",
+                "5449a5e0.ed04bc"
+            ]
+        ]
+    },
+    {
+        "id": "fb5055b7.45aac8",
+        "type": "debug",
+        "z": "91d3f054.ad921",
+        "name": "value",
+        "active": false,
+        "complete": "payload.d.value",
+        "x": 570,
+        "y": 240,
+        "wires": []
+    },
+    {
+        "id": "38aa8e4.f1dec72",
+        "type": "ibmiot in",
+        "z": "91d3f054.ad921",
+        "authentication": "quickstart",
+        "apiKey": "e9b79caa.1f274",
+        "inputType": "evt",
+        "logicalInterface": "",
+        "ruleId": "",
+        "deviceId": "Anggeloko",
+        "applicationId": "",
+        "deviceType": "+",
+        "eventType": "+",
+        "commandType": "",
+        "format": "json",
+        "name": "IBM IoT App In",
+        "service": "quickstart",
+        "allDevices": false,
+        "allApplications": false,
+        "allDeviceTypes": true,
+        "allLogicalInterfaces": false,
+        "allEvents": true,
+        "allCommands": false,
+        "allFormats": false,
+        "qos": "0",
+        "x": 400,
+        "y": 240,
+        "wires": [
+            [
+                "fb5055b7.45aac8"
+            ]
+        ]
+    },
+    {
+        "id": "4710373c.cc2f68",
+        "type": "ibmiot out",
+        "z": "91d3f054.ad921",
+        "authentication": "apiKey",
+        "apiKey": "e9b79caa.1f274",
+        "outputType": "evt",
+        "deviceId": "Anggeloko",
+        "deviceType": "Node",
+        "eventCommandType": "Funcion1",
+        "format": "json",
+        "data": "0",
+        "qos": "2",
+        "name": "IBM IoT event",
+        "service": "registered",
+        "x": 600,
+        "y": 120,
+        "wires": []
+    },
+    {
+        "id": "df130e40.5cda4",
+        "type": "ibmiot in",
+        "z": "91d3f054.ad921",
+        "authentication": "apiKey",
+        "apiKey": "e9b79caa.1f274",
+        "inputType": "evt",
+        "logicalInterface": "",
+        "ruleId": "",
+        "deviceId": "Anggeloko",
+        "applicationId": "",
+        "deviceType": "+",
+        "eventType": "+",
+        "commandType": "",
+        "format": "json",
+        "name": "IBM IoT Read",
+        "service": "registered",
+        "allDevices": "",
+        "allApplications": "",
+        "allDeviceTypes": true,
+        "allLogicalInterfaces": "",
+        "allEvents": true,
+        "allCommands": "",
+        "allFormats": "",
+        "qos": "2",
+        "x": 390,
+        "y": 180,
+        "wires": [
+            [
+                "b028c6a3.1a8b88"
+            ]
+        ]
+    },
+    {
+        "id": "b028c6a3.1a8b88",
+        "type": "debug",
+        "z": "91d3f054.ad921",
+        "name": "Valor",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "x": 570,
+        "y": 180,
+        "wires": []
+    },
+    {
+        "id": "de06d1bc.ad213",
+        "type": "ibmiot out",
+        "z": "91d3f054.ad921",
+        "authentication": "apiKey",
+        "apiKey": "e9b79caa.1f274",
+        "outputType": "evt",
+        "deviceId": "Anggeloko",
+        "deviceType": "Node",
+        "eventCommandType": "Funcion2",
+        "format": "json",
+        "data": "0",
+        "qos": "2",
+        "name": "IBM IoT",
+        "service": "registered",
+        "x": 620,
+        "y": 380,
+        "wires": []
+    },
+    {
+        "id": "69d17a73.873bd4",
+        "type": "inject",
+        "z": "91d3f054.ad921",
+        "name": "",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "repeat": "1",
+        "crontab": "",
+        "once": false,
+        "x": 130,
+        "y": 360,
+        "wires": [
+            [
+                "2ab2f774.6693e8"
+            ]
+        ]
+    },
+    {
+        "id": "ef1b936f.174c1",
+        "type": "wiotp out",
+        "z": "91d3f054.ad921",
+        "authType": "d",
+        "qs": "true",
+        "qsDeviceId": "Anggeloko",
+        "deviceKey": "",
+        "deviceType": "",
+        "deviceId": "",
+        "event": "event",
+        "format": "json",
+        "qos": "",
+        "name": "",
+        "x": 610,
+        "y": 320,
+        "wires": []
+    },
+    {
+        "id": "2ab2f774.6693e8",
+        "type": "function",
+        "z": "91d3f054.ad921",
+        "name": "Generate time data",
+        "func": "// Convert timestamp in milliseconds to a number in 0-20 range\nmsg.payload = Math.floor((msg.payload/1000))%30;\nreturn msg;",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 410,
+        "y": 360,
+        "wires": [
+            [
+                "de06d1bc.ad213",
+                "ef1b936f.174c1"
+            ]
+        ]
+    },
+    {
+        "id": "5449a5e0.ed04bc",
+        "type": "wiotp out",
+        "z": "91d3f054.ad921",
+        "authType": "d",
+        "qs": "true",
+        "qsDeviceId": "Anggeloko",
+        "deviceKey": "",
+        "deviceType": "",
+        "deviceId": "",
+        "event": "event",
+        "format": "json",
+        "qos": "",
+        "name": "",
+        "x": 590,
+        "y": 60,
+        "wires": []
+    },
+    {
+        "id": "e9b79caa.1f274",
+        "type": "ibmiot",
+        "z": "",
+        "name": "Node",
+        "keepalive": "60",
+        "serverName": "gxfbkr.messaging.internetofthings.ibmcloud.com",
+        "cleansession": true,
+        "appId": "",
+        "shared": false
+    }
+]

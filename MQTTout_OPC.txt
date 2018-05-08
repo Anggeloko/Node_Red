@@ -1,0 +1,371 @@
+[
+    {
+        "id": "8efbb651.c6748",
+        "type": "OPCUA-IIoT-Server-Command",
+        "z": "18dbfa6d.e7b466",
+        "commandtype": "restart",
+        "nodeId": "",
+        "name": "warm restart with defaults",
+        "x": 375,
+        "y": 106,
+        "wires": [
+            [
+                "3052f96a.82af8e"
+            ]
+        ]
+    },
+    {
+        "id": "a458d859.423518",
+        "type": "OPCUA-IIoT-Inject",
+        "z": "18dbfa6d.e7b466",
+        "injectType": "inject",
+        "payload": "",
+        "payloadType": "date",
+        "topic": "",
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "startDelay": "",
+        "name": "",
+        "addressSpaceItems": [],
+        "x": 145,
+        "y": 106,
+        "wires": [
+            [
+                "8efbb651.c6748"
+            ]
+        ]
+    },
+    {
+        "id": "1ccac293.9b7205",
+        "type": "debug",
+        "z": "18dbfa6d.e7b466",
+        "name": "",
+        "active": true,
+        "console": "false",
+        "complete": "false",
+        "x": 755,
+        "y": 106,
+        "wires": []
+    },
+    {
+        "id": "3052f96a.82af8e",
+        "type": "OPCUA-IIoT-Flex-Server",
+        "z": "18dbfa6d.e7b466",
+        "port": "55392",
+        "endpoint": "",
+        "acceptExternalCommands": true,
+        "maxAllowedSessionNumber": "",
+        "maxConnectionsPerEndpoint": "",
+        "maxAllowedSubscriptionNumber": "",
+        "alternateHostname": "",
+        "name": "",
+        "showStatusActivities": false,
+        "showErrors": false,
+        "allowAnonymous": true,
+        "isAuditing": false,
+        "serverDiscovery": true,
+        "users": [],
+        "xmlsets": [],
+        "publicCertificateFile": "",
+        "privateCertificateFile": "",
+        "maxNodesPerRead": 1000,
+        "maxNodesPerBrowse": 2000,
+        "addressSpaceScript": "function constructAlarmAddressSpace(server, addressSpace, eventObjects, done) {\n    // server = the created node-opcua server\n    // addressSpace = script placeholder\n    // eventObjects = to hold event variables in memory from this script\n    \n    // internal global sandbox objects are \n    // node = node of the flex server, \n    // coreServer = core iiot server object for debug and access to nodeOPCUA,\n    // and scriptObjects to hold variables and functions\n    \n    // globals are to find on node.context().global and should be initialized here\n\n    coreServer.internalDebugLog('init dynamic address space')\n    node.warn('construct new address space for OPC UA')\n    \n    // from here - see the node-opcua docs how to build address sapces\n \n    // variable with value\n    if(scriptObjects.MeterVisual === undefined || scriptObjects.MeterVisual === null) {\n            scriptObjects.MeterVisual = 0\n    }\n    \n    if(scriptObjects.PWM === undefined || scriptObjects.PWM === null) {\n            scriptObjects.PWM = 0\n    }\n    \n    if(scriptObjects.LedVisual === undefined || scriptObjects.LedVisual === null) {\n            scriptObjects.LedVisual = 'FALSE'\n    }\n    \n    if(scriptObjects.DigiOut === undefined || scriptObjects.DigiOut === null) {\n            scriptObjects.DigiOut = 'FALSE'\n    }\n    \n\n    let MQTTout = addressSpace.addObject({\n        browseName: 'MQTTout',\n        description: 'The Object representing some variables',\n        organizedBy: addressSpace.rootFolder.objects,\n        notifierOf: addressSpace.rootFolder.objects.server\n    })\n    \n        if(coreServer.core) {\n        addressSpace.addVariable({\n            componentOf: MQTTout,\n            nodeId: 'ns=4;s=MeterV',\n            browseName: 'MeterV',\n            displayName: 'MeterV',\n            dataType: 'Double',\n            \n            value: {\n              get: function () {\n                return new coreServer.core.nodeOPCUA.Variant({\n                        dataType: 'Double',\n                        value: scriptObjects.MeterVisual\n                })\n              },\n                  set: function (variant) {\n                      scriptObjects.MeterVisual = parseFloat(variant.value)\n                      return coreServer.core.nodeOPCUA.StatusCodes.Good\n                  }\n            }\n        })\n        }\n        \n        if(coreServer.core) {\n        addressSpace.addVariable({\n            componentOf: MQTTout,\n            nodeId: 'ns=4;s=PWMOUT',\n            browseName: 'PWMOUT',\n            displayName: 'PWMOUT',\n            dataType: 'Double',\n            \n            value: {\n              get: function () {\n                return new coreServer.core.nodeOPCUA.Variant({\n                        dataType: 'Double',\n                        value: scriptObjects.PWM\n                })\n              },\n                  set: function (variant) {\n                      scriptObjects.PWM = parseFloat(variant.value)\n                      return coreServer.core.nodeOPCUA.StatusCodes.Good\n                  }\n            }\n        })\n        }\n        \n        if(coreServer.core) {\n        addressSpace.addVariable({\n            componentOf: MQTTout,\n            nodeId: 'ns=4;s=LedVisu',\n            browseName: 'LedVisu',\n            displayName: 'LedVisu',\n            dataType: 'String',\n            \n            value: {\n              get: function () {\n                return new coreServer.core.nodeOPCUA.Variant({\n                        dataType: 'String',\n                        value: scriptObjects.LedVisual\n                })\n              },\n                  set: function (variant) {\n                      scriptObjects.LedVisual = parseFloat(variant.value)\n                      return coreServer.core.nodeOPCUA.StatusCodes.Good\n                  }\n            }\n        })\n        }\n        \n        \n        if(coreServer.core) {\n        addressSpace.addVariable({\n            componentOf: MQTTout,\n            nodeId: 'ns=4;s=DigiOut',\n            browseName: 'DigiOut',\n            displayName: 'DigiOut',\n            dataType: 'String',\n            \n            value: {\n              get: function () {\n                return new coreServer.core.nodeOPCUA.Variant({\n                        dataType: 'String',\n                        value: scriptObjects.DigiOut\n                })\n              },\n                  set: function (variant) {\n                      scriptObjects.DigiOut = parseFloat(variant.value)\n                      return coreServer.core.nodeOPCUA.StatusCodes.Good\n                  }\n            }\n        })\n        }\n        \n    else {\n        coreServer.internalDebugLog('coreServer.core needed for coreServer.core.nodeOPCUA')\n    }\n    \n    done()\n}",
+        "x": 585,
+        "y": 106,
+        "wires": [
+            [
+                "1ccac293.9b7205"
+            ]
+        ]
+    },
+    {
+        "id": "2d6c49e0.6a4086",
+        "type": "mqtt out",
+        "z": "18dbfa6d.e7b466",
+        "name": "Enviar",
+        "topic": "/Visualizacion/mt1",
+        "qos": "0",
+        "retain": "",
+        "broker": "337065f.d09389a",
+        "x": 584,
+        "y": 417,
+        "wires": []
+    },
+    {
+        "id": "e9ea1aa2.80288",
+        "type": "inject",
+        "z": "18dbfa6d.e7b466",
+        "name": "Meter",
+        "topic": "ns=4;s=MeterV;datatype=Double",
+        "payload": "",
+        "payloadType": "str",
+        "repeat": "1",
+        "crontab": "",
+        "once": true,
+        "onceDelay": "2",
+        "x": 232,
+        "y": 420,
+        "wires": [
+            [
+                "907ea389.aec6f8"
+            ]
+        ]
+    },
+    {
+        "id": "cdaf3778.cb816",
+        "type": "mqtt out",
+        "z": "18dbfa6d.e7b466",
+        "name": "Enviar",
+        "topic": "/Visualizacion/ld1",
+        "qos": "0",
+        "retain": "",
+        "broker": "337065f.d09389a",
+        "x": 585,
+        "y": 515,
+        "wires": []
+    },
+    {
+        "id": "13acfd8b.f7e7aa",
+        "type": "inject",
+        "z": "18dbfa6d.e7b466",
+        "name": "Led",
+        "topic": "ns=4;s=LedVisu;datatype=String",
+        "payload": "",
+        "payloadType": "str",
+        "repeat": "1",
+        "crontab": "",
+        "once": true,
+        "onceDelay": "2",
+        "x": 240,
+        "y": 515,
+        "wires": [
+            [
+                "4c249caf.3feecc"
+            ]
+        ]
+    },
+    {
+        "id": "c2c7c645.c3d978",
+        "type": "mqtt out",
+        "z": "18dbfa6d.e7b466",
+        "name": "Out_analg",
+        "topic": "/outRPI/Aout1",
+        "qos": "0",
+        "retain": "",
+        "broker": "337065f.d09389a",
+        "x": 593,
+        "y": 209,
+        "wires": []
+    },
+    {
+        "id": "6b8522aa.874434",
+        "type": "inject",
+        "z": "18dbfa6d.e7b466",
+        "name": "AnalogRPI",
+        "topic": "ns=4;s=PWMOUT;datatype=Double",
+        "payload": "",
+        "payloadType": "str",
+        "repeat": "1",
+        "crontab": "",
+        "once": true,
+        "onceDelay": "2",
+        "x": 234,
+        "y": 209,
+        "wires": [
+            [
+                "d3a8439b.dfd9f8"
+            ]
+        ]
+    },
+    {
+        "id": "8c4f20c0.7a2c48",
+        "type": "mqtt out",
+        "z": "18dbfa6d.e7b466",
+        "name": "Out_digital",
+        "topic": "/outRPI/Dout1",
+        "qos": "0",
+        "retain": "",
+        "broker": "337065f.d09389a",
+        "x": 600,
+        "y": 311,
+        "wires": []
+    },
+    {
+        "id": "76b01102.ed7d08",
+        "type": "inject",
+        "z": "18dbfa6d.e7b466",
+        "name": "DigitalRPI",
+        "topic": "ns=4;s=DigiOut;datatype=String",
+        "payload": "",
+        "payloadType": "str",
+        "repeat": "1",
+        "crontab": "",
+        "once": true,
+        "onceDelay": "2",
+        "x": 224,
+        "y": 313,
+        "wires": [
+            [
+                "e955c05.e9fee4"
+            ]
+        ]
+    },
+    {
+        "id": "907ea389.aec6f8",
+        "type": "OpcUa-Client",
+        "z": "18dbfa6d.e7b466",
+        "endpoint": "e4f88946.d535d8",
+        "action": "read",
+        "time": 10,
+        "timeUnit": "s",
+        "name": "",
+        "x": 400,
+        "y": 420,
+        "wires": [
+            [
+                "2d6c49e0.6a4086",
+                "9fe430ea.c5b3d8"
+            ]
+        ]
+    },
+    {
+        "id": "d3a8439b.dfd9f8",
+        "type": "OpcUa-Client",
+        "z": "18dbfa6d.e7b466",
+        "endpoint": "e4f88946.d535d8",
+        "action": "read",
+        "time": 10,
+        "timeUnit": "s",
+        "name": "",
+        "x": 415,
+        "y": 209,
+        "wires": [
+            [
+                "c2c7c645.c3d978",
+                "146772b6.00a455"
+            ]
+        ]
+    },
+    {
+        "id": "e955c05.e9fee4",
+        "type": "OpcUa-Client",
+        "z": "18dbfa6d.e7b466",
+        "endpoint": "e4f88946.d535d8",
+        "action": "read",
+        "time": 10,
+        "timeUnit": "s",
+        "name": "",
+        "x": 402,
+        "y": 313,
+        "wires": [
+            [
+                "8c4f20c0.7a2c48",
+                "cd7ee0a.47a02a"
+            ]
+        ]
+    },
+    {
+        "id": "4c249caf.3feecc",
+        "type": "OpcUa-Client",
+        "z": "18dbfa6d.e7b466",
+        "endpoint": "e4f88946.d535d8",
+        "action": "read",
+        "time": 10,
+        "timeUnit": "s",
+        "name": "",
+        "x": 394,
+        "y": 516,
+        "wires": [
+            [
+                "cdaf3778.cb816",
+                "887b1bea.c889d8"
+            ]
+        ]
+    },
+    {
+        "id": "146772b6.00a455",
+        "type": "debug",
+        "z": "18dbfa6d.e7b466",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "x": 599,
+        "y": 258,
+        "wires": []
+    },
+    {
+        "id": "cd7ee0a.47a02a",
+        "type": "debug",
+        "z": "18dbfa6d.e7b466",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "x": 606,
+        "y": 363,
+        "wires": []
+    },
+    {
+        "id": "9fe430ea.c5b3d8",
+        "type": "debug",
+        "z": "18dbfa6d.e7b466",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "x": 606,
+        "y": 470,
+        "wires": []
+    },
+    {
+        "id": "887b1bea.c889d8",
+        "type": "debug",
+        "z": "18dbfa6d.e7b466",
+        "name": "",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "x": 610,
+        "y": 567,
+        "wires": []
+    },
+    {
+        "id": "337065f.d09389a",
+        "type": "mqtt-broker",
+        "z": "",
+        "name": "ServerCloudMqtt",
+        "broker": "m14.cloudmqtt.com",
+        "port": "13198",
+        "clientid": "",
+        "usetls": false,
+        "compatmode": true,
+        "keepalive": "60",
+        "cleansession": true,
+        "willTopic": "",
+        "willQos": "0",
+        "willPayload": "",
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthPayload": ""
+    },
+    {
+        "id": "e4f88946.d535d8",
+        "type": "OpcUa-Endpoint",
+        "z": "",
+        "endpoint": "opc.tcp://127.0.0.1:55392",
+        "secpol": "None",
+        "secmode": "NONE",
+        "login": false
+    }
+]
